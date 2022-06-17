@@ -1,8 +1,8 @@
 # SCOM_MPFragments
 
-There are Some cool MP fragments written BY Kavin Holman,
-when i first used the VSA Extention, it was fun to learn from thease fragments.
+There are some cool MP fragments written by Kavin Holman,
+when I first used the VSA Extention, it was fun to learn from thease fragments.
 
-This reporsitory is for MP fragments that i have written during my Authoring assignments.
+This reporsitory is for MP fragments that I have written during my authoring assignments.
 
-Thease are strictly on AS IS basis, i am not responsible for any issues.
+Thease are strictly on AS IS basis, I am not responsible for any issues.
