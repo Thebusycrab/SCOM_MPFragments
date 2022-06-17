@@ -1,0 +1,139 @@
+﻿<ManagementPackFragment SchemaVersion="2.0" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <TypeDefinitions>
+    <MonitorTypes>
+      <UnitMonitorType ID="Microsoft.Unix.WSMan.Performance.Average.Threshold.Threestate.MonitorType" Accessibility="Public">
+        <MonitorTypeStates>
+          <MonitorTypeState ID="Warning"/>
+          <MonitorTypeState ID="Critical"/>
+          <MonitorTypeState ID="Ok"/>
+        </MonitorTypeStates>
+        <Configuration>
+          <IncludeSchemaTypes>
+            <SchemaType>System!System.ExpressionEvaluatorSchema</SchemaType>
+          </IncludeSchemaTypes>
+          <xsd:element name="TargetSystem" type="xsd:string"/>
+          <xsd:element name="Uri" type="xsd:string"/>
+          <xsd:element name="Filter" type="xsd:string" minOccurs="0" maxOccurs="1"/>
+          <xsd:element name="SplitItems" type="xsd:boolean"/>
+          <xsd:element name="Interval" type="xsd:unsignedInt"/>
+          <xsd:element name="SyncTime" type="xsd:string" minOccurs="0" maxOccurs="1"/>
+          <xsd:element name="ObjectName" type="xsd:string"/>
+          <xsd:element name="CounterName" type="xsd:string"/>
+          <xsd:element name="InstanceName" type="xsd:string"/>
+          <xsd:element name="Value" type="xsd:string"/>
+          <xsd:element name="WarningThreshold" type="xsd:double"/>
+          <xsd:element name="CriticalThreshold" type="xsd:double"/>
+          <xsd:element name="NumSamples" type="xsd:unsignedInt"/>
+          <xsd:element xmlns:xsd="http://www.w3.org/2001/XMLSchema" minOccurs="0" name="PreMapperFilter" type="ExpressionType"/>
+        </Configuration>
+        <OverrideableParameters>
+          <OverrideableParameter ID="Interval" ParameterType="int" Selector="$Config/Interval$"/>
+          <OverrideableParameter ID="SyncTime" ParameterType="string" Selector="$Config/SyncTime$"/>
+          <OverrideableParameter ID="WarningThreshold" ParameterType="double" Selector="$Config/WarningThreshold$"/>
+          <OverrideableParameter ID="CriticalThreshold" ParameterType="double" Selector="$Config/CriticalThreshold$"/>
+          <OverrideableParameter ID="NumSamples" ParameterType="int" Selector="$Config/NumSamples$"/>
+        </OverrideableParameters>
+        <MonitorImplementation>
+          <MemberModules>
+            <DataSource ID="DS" TypeID="Unix!Microsoft.Unix.WSMan.PerfCounterProvider">
+              <TargetSystem>$Config/TargetSystem$</TargetSystem>
+              <Uri>$Config/Uri$</Uri>
+              <Filter>$Config/Filter$</Filter>
+              <SplitItems>$Config/SplitItems$</SplitItems>
+              <Interval>$Config/Interval$</Interval>
+              <SyncTime>$Config/SyncTime$</SyncTime>
+              <ObjectName>$Config/ObjectName$</ObjectName>
+              <CounterName>$Config/CounterName$</CounterName>
+              <InstanceName>$Config/InstanceName$</InstanceName>
+              <Value>$Config/Value$</Value>
+              <PreMapperFilter>$Config/PreMapperFilter$</PreMapperFilter>
+            </DataSource>
+            <ConditionDetection ID="CDAverageThreshold" TypeID="SystemPerf!System.Performance.AveragerCondition">
+              <NumSamples>$Config/NumSamples$</NumSamples>
+            </ConditionDetection>
+            <ConditionDetection ID="CDSuccess" TypeID="System!System.ExpressionFilter">
+              <Expression>
+                <SimpleExpression>
+                  <ValueExpression>
+                    <XPathQuery Type="Double">Value</XPathQuery>
+                  </ValueExpression>
+                  <Operator>LessEqual</Operator>
+                  <ValueExpression>
+                    <Value Type="Double">$Config/WarningThreshold$</Value>
+                  </ValueExpression>
+                </SimpleExpression>
+              </Expression>
+            </ConditionDetection>
+            <ConditionDetection ID="CDWarning" TypeID="System!System.ExpressionFilter">
+              <Expression>
+                <And>
+                  <Expression>
+                    <SimpleExpression>
+                      <ValueExpression>
+                        <XPathQuery Type="Double">Value</XPathQuery>
+                      </ValueExpression>
+                      <Operator>Greater</Operator>
+                      <ValueExpression>
+                        <Value Type="Double">$Config/WarningThreshold$</Value>
+                      </ValueExpression>
+                    </SimpleExpression>
+                  </Expression>
+                  <Expression>
+                    <SimpleExpression>
+                      <ValueExpression>
+                        <XPathQuery Type="Double">Value</XPathQuery>
+                      </ValueExpression>
+                      <Operator>LessEqual</Operator>
+                      <ValueExpression>
+                        <Value Type="Double">$Config/CriticalThreshold$</Value>
+                      </ValueExpression>
+                    </SimpleExpression>
+                  </Expression>
+                </And>
+              </Expression>
+            </ConditionDetection>
+            <ConditionDetection ID="CDError" TypeID="System!System.ExpressionFilter">
+              <Expression>
+                <SimpleExpression>
+                  <ValueExpression>
+                    <XPathQuery Type="Double">Value</XPathQuery>
+                  </ValueExpression>
+                  <Operator>Greater</Operator>
+                  <ValueExpression>
+                    <Value Type="Double">$Config/CriticalThreshold$</Value>
+                  </ValueExpression>
+                </SimpleExpression>
+              </Expression>
+            </ConditionDetection>
+          </MemberModules>
+          <RegularDetections>
+            <RegularDetection MonitorTypeStateID="Ok">
+              <Node ID="CDSuccess">
+                <Node ID="CDAverageThreshold">
+                  <Node ID="DS"/>
+                </Node>
+              </Node>
+            </RegularDetection>
+            <RegularDetection MonitorTypeStateID="Warning">
+              <Node ID="CDWarning">
+                <Node ID="CDAverageThreshold">
+                  <Node ID="DS"/>
+                </Node>
+              </Node>
+            </RegularDetection>
+            <RegularDetection MonitorTypeStateID="Critical">
+              <Node ID="CDError">
+                <Node ID="CDAverageThreshold">
+                  <Node ID="DS"/>
+                </Node>
+              </Node>
+            </RegularDetection>
+          </RegularDetections>
+        </MonitorImplementation>
+      </UnitMonitorType>
+      
+    </MonitorTypes>
+         
+  </TypeDefinitions>
+  
+</ManagementPackFragment>
